@@ -9,6 +9,9 @@ router.get('/slack/callback', handleSlackAuthRedirect);
 router.get('/slack/success',function(req,res){
     res.send("Close the Window");
 })
+router.get("/",function(req,res){
+    res.send("Hello");
+})
 
 
 
