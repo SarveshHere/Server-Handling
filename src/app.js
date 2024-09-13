@@ -13,6 +13,10 @@ const io = new SocketIO(server);
 app.use(express.json());
 app.use('/auth', authRoutes);
 
+app.get("/", function(req,res){
+  res.send("Server Start Point");
+})
+
 io.on('connection', (socket) => {
   socket.on('join', (sessionId) => {
       socket.join(sessionId);
