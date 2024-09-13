@@ -24,6 +24,7 @@ io.on('connection', (socket) => {
 });
 export {io};
 
-server.listen(process.env.PORT, () => {
-  console.log(`Server Started at Port ${process.env.PORT}`);
+const port= process.env.PORT || 3000;
+server.listen(port, () => {
+  console.log(`Server Started at Port ${port}`);
 });
