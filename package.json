@@ -5,9 +5,7 @@
     "main": "app.js",
     "type": "module",
     "scripts": {
-        "start": "NODE_ENV=development ./node_modules/.bin/netlify-lambda serve src",
-        "build": "NODE_ENV=production ./node_modules/.bin/netlify-lambda build src",
-        "dev": "nodemon ./src/app.js"
+        "start": "nodemon ./src/app.js"
     },
     "keywords": [],
     "author": "",
@@ -15,7 +13,6 @@
         "axios": "^1.3.3",
         "dotenv": "^16.4.5",
         "express": "^4.18.2",
-        "netlify-lambda": "^2.0.16",
         "socket.io": "^4.6.1",
         "uuid": "^10.0.0"
     },
