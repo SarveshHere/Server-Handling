@@ -1,8 +1,8 @@
 import express from 'express';
 import http from 'http';
 import { Server as SocketIO } from 'socket.io';
-import authRoutes from './routes/AuthRoutes.js';
 import dotenv from 'dotenv';
+import authRoutes from './routes/SlackAuthRoutes.js';
 
 dotenv.config();
 
@@ -13,18 +13,31 @@ const io = new SocketIO(server);
 app.use(express.json());
 app.use('/auth', authRoutes);
 
-app.get("/", function(req,res){
-  res.send("Server Start Point");
-})
-
+let sessions =new Map();
 io.on('connection', (socket) => {
-  socket.on('join', (sessionId) => {
-      socket.join(sessionId);
-  });
-});
-export {io};
+  const sessionId = socket.handshake.query.sessionId;
 
-const port= process.env.PORT || 3000;
-server.listen(port, () => {
-  console.log(`Server Started at Port ${port}`);
+  if (sessionId && sessions.has(sessionId)) {
+    sessions.set(sessionId, socket);
+    console.log(sessions);
+
+    console.log(`Client connected with sessionID: ${sessionId}`);
+
+    socket.on('disconnect', () => {
+        sessions.delete(sessionId);
+        console.log(`Client disconnected with sessionID: ${sessionId}`);
+        console.log(sessions);
+    });
+  } else {
+    socket.disconnect();
+  }
+
 });
+
+const port = process.env.PORT || 3000;
+
+server.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
+
+export { io, sessions };

@@ -1,4 +1,5 @@
 .vscode
+dist
 
 # Dependency directories
 node_modules/

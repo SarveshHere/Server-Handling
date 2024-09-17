@@ -1,9 +1,10 @@
 {
     "name": "slack-teams-ps-integration-server",
     "version": "1.0.0",
-    "description": "",
     "main": "app.js",
     "type": "module",
+    "license": "ISC",
+    "description": "",
     "scripts": {
         "start": "nodemon ./src/app.js"
     },
