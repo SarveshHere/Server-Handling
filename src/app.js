@@ -26,6 +26,10 @@ io.on('connection', (socket) => {
 
     console.log(`Client connected with sessionID: ${sessionId}`);
 
+    if(userScope){
+      socket.emit('authBegin', userScope);
+    }
+
     socket.on('disconnect', () => {
         sessions.delete(sessionId);
         console.log(`Client disconnected with sessionID: ${sessionId}`);
