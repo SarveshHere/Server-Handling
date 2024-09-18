@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 import { v4 as uuid } from "uuid";
 import querystring from "querystring"; 
@@ -8,8 +7,6 @@ export const createSession = async (req, res) => {
 
   const sessionId = uuid();
   sessions.set(sessionId, {});
-  console.log(sessionId);
-  console.log(sessions);
   res.json({ sessionId });
   
 };
@@ -18,6 +15,10 @@ export const startSlackAuth = async (req, res) => {
 
   const { sessionId } = req.query;
   try {
+
+    if (!sessions.has(sessionId)) {
+      return res.status(400).send('Invalid session ID');
+    }
   
     const state = encodeURIComponent(JSON.stringify({
       sessionId
@@ -25,7 +26,7 @@ export const startSlackAuth = async (req, res) => {
   
     const clientId = process.env.CLIENT_ID;
     const redirectUri = process.env.REDIRECT_URI;
-    const userScope = "channels:read,groups:read,users:read,chat:write,channels:write,groups:write,im:read,files:write";
+    const userScope = sessions.get(sessionId).userScope;
   
     const queryString = querystring.stringify({
       user_scope: userScope,
@@ -54,6 +55,10 @@ export const handleSlackAuthRedirect = async (req, res) => {
   
   try {
 
+    if (!sessions.has(sessionId)) {
+      return res.status(400).send('Invalid session ID');
+    }
+
     const clientId = process.env.CLIENT_ID;
     const clientSecret = process.env.CLIENT_SECRET;
     const redirectUri = process.env.REDIRECT_URI;
@@ -74,19 +79,19 @@ export const handleSlackAuthRedirect = async (req, res) => {
 
     const response = await axios(requestOptions);
      
-    const updatedSession = {
+    const responseToClient = {
       sessionId,
       userAccessToken: response.data.authed_user && response.data.authed_user.access_token,
       workspaceId: response.data.team.id,
       workspaceName: response.data.team.name
     };
     
-    let socket = sessions.get(sessionId);
-    console.log(sessions);
-    console.log(socket);
-    io.sockets.to(socket.id).emit('authSuccess', updatedSession);
+    const socket = sessions.get(sessionId).socket;
+    
+    io.sockets.to(socket.id).emit('authSuccess', responseToClient);
     
     res.redirect(`${process.env.BASE_URL}/auth/slack/success`);
+
   } catch (error) {
 
     console.error('Error during Slack OAuth exchange:', error);

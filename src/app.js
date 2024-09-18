@@ -13,21 +13,24 @@ const io = new SocketIO(server);
 app.use(express.json());
 app.use('/auth', authRoutes);
 
-let sessions =new Map();
+const sessions =new Map();
+
 io.on('connection', (socket) => {
+
   const sessionId = socket.handshake.query.sessionId;
+  const userScope = socket.handshake.query.userScope;
 
   if (sessionId && sessions.has(sessionId)) {
-    sessions.set(sessionId, socket);
-    console.log(sessions);
+
+    sessions.set(sessionId, {socket, userScope});
 
     console.log(`Client connected with sessionID: ${sessionId}`);
 
     socket.on('disconnect', () => {
         sessions.delete(sessionId);
         console.log(`Client disconnected with sessionID: ${sessionId}`);
-        console.log(sessions);
     });
+    
   } else {
     socket.disconnect();
   }
