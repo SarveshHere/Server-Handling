@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Photoshop Desktop App</title>
+    <style>
+        h1 {
+            font-weight: bold;
+            font-size: 40px;
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 10px;
+        }
+
+        p {
+            font-size: 16px;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #555;
+            margin: 0;
+        }
+
+        .successMessage {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="successMessage">
+        <img src="/images/icon.png" alt="Photoshop_Icon" width="60px" height="60px">
+        <h1>Launching Adobe Photoshop</h1>
+        <p>We've redirected you to the desktop app.</p>
+    </div>
+
+    <script>
+        window.onload = function () {
+            window.location.href = "adbps://app?action=openSharePanel";
+        };
+    </script>
+</body>
+
+</html>
