@@ -55,13 +55,28 @@ export const startSlackAuth = async (req, res) => {
 
 export const handleSlackAuthRedirect = async (req, res) => {
 
-  const { code, state } = req.query;
-  const { sessionId } = JSON.parse(decodeURIComponent(state));
+  const { error, code, state } = req.query;
 
   try {
 
+    if (!state) {
+      return res.status(400).send('Empty session ID');
+    }
+    const { sessionId } = JSON.parse(decodeURIComponent(state));
+
     if (!sessions.has(sessionId)) {
       return res.status(400).send('Invalid session ID');
+    }
+
+    const socket = sessions.get(sessionId).socket;
+
+    if (error) {
+      io.sockets.to(socket.id).emit('authCancelled', error);
+      return res.status(400).send('Authentication cancelled.');
+    }
+
+    if (!code) {
+      return res.status(400).send('Authentication Failure Occurred.');
     }
 
     const clientId = process.env.CLIENT_ID;
@@ -90,8 +105,6 @@ export const handleSlackAuthRedirect = async (req, res) => {
       workspaceId: response.data.team.id,
       workspaceName: response.data.team.name
     };
-
-    const socket = sessions.get(sessionId).socket;
 
     io.sockets.to(socket.id).emit('authSuccess', responseToClient);
 
